@@ -71,7 +71,7 @@ namespace SummonerNameCheckerConsole
             var summoners = new List<Summoner>();
             try
             {
-                apiHelper = new ApiHelper(options.ApiKey, ServerLookup.GetServer(options.Server));
+                apiHelper = new ApiHelper(options.ApiKey, options.Server);
 
                 foreach (var name in names)
                 {

@@ -14,21 +14,23 @@ namespace SummonerNameChecker
         private HttpClient _httpClient;
         private string _apiKey;
 
-        public ApiHelper(string apiKey, Server server)
-        {
-            _apiKey = apiKey;
+        public ApiHelper(string apiKey, Server server) :
+            this(apiKey, server.ToServerCode()) { }
 
-            var serverCode = ServerLookup.GetServerCode(server);
+        public ApiHelper(string apiKey, string serverCode)
+        {
+            if (string.IsNullOrEmpty(apiKey))
+                throw new ArgumentException("Invalid Riot Games API Key", nameof(apiKey));
+
+            if (string.IsNullOrEmpty(serverCode))
+                throw new ArgumentException("Invalid server code", nameof(serverCode));
+
+            _apiKey = apiKey;
 
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri($"https://{serverCode}.api.riotgames.com/lol/");
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        }
-
-        private Exception ArgumentException(string v)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<Summoner> GetSummoner(string summonerName)

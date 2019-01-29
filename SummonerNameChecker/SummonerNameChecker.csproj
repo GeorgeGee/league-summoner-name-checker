@@ -55,7 +55,7 @@
     <Compile Include="Models\Data Transfer Objects\MatchListDto.cs" />
     <Compile Include="Models\Data Transfer Objects\MatchReferenceDto.cs" />
     <Compile Include="Models\Data Transfer Objects\SummonerDto.cs" />
-    <Compile Include="Models\ServerLookup.cs" />
+    <Compile Include="Extensions\ServerExtensions.cs" />
     <Compile Include="Models\Summoner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
