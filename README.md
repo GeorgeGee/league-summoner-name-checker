@@ -14,18 +14,17 @@
 2. Create a text file `names.txt` inside the same folder, containing summoner names to check availability for (line separated)
 3. Open PowerShell or Command Prompt and change directory to the folder which contains the downloaded files
 4. Run the following command:  
-`.\SummonerNameCheckerConsole.exe --apikey "API_KEY" --input "names.txt" --server "euw1" --table`
+`.\SummonerNameCheckerConsole.exe --apikey "API_KEY" --input "names.txt" --server "euw1"`
 > Replace `API_KEY` with your Riot Games API key. Get one for free at https://developer.riotgames.com
 
 ## Arguments
-Name|Description
--|-
-`-a` or `--apikey`|Required. Riot Games API key. Get one for free at https://developer.riotgames.com 
-`-i` or `--input`|Required. Input .txt file path
-`-t` or `--table`|Display a table containing the results
-`-s` or `--server`|Server ID (see below)
+Name|Type|Description
+-|-|-
+`-a` or `--apikey`|String|**Required.** Riot Games API key. Get one for free at https://developer.riotgames.com 
+`-i` or `--input`|String|**Required.** Input `.txt` file path
+`-s` or `--server`|String|*Optional.* League of Legends game server code (see below). Default is `euw1` (EU West)
 
-Server|ID
+Server|Code
 -|-
 Europe West|`euw1`
 Europe Nordic & East|`eun1`

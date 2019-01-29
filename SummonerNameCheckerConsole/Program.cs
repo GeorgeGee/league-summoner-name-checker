@@ -1,6 +1,5 @@
 ﻿using CommandLine;
 using SummonerNameChecker;
-using SummonerNameChecker.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,10 +26,7 @@ namespace SummonerNameCheckerConsole
         //[Option('o', "output", Required = false, HelpText = "Output .csv file path")]
         //public string OutputFilePath { get; set; }
 
-        [Option('t', "table", Required = false, HelpText = "Display a table containing the results")]
-        public bool DisplayTable { get; set; }
-
-        [Option('s', "server", Required = false, HelpText = "Server", Default = "euw1")]
+        [Option('s', "server", Required = false, HelpText = "League of Legends game server code. Default is \"euw1\" (EU West)", Default = "euw1")]
         public string Server { get; set; }
     }
 
@@ -85,10 +81,14 @@ namespace SummonerNameCheckerConsole
                 Console.WriteLine($"Error while communicating with Riot Games API.\n{e.Message}");
             }
 
-            if (options.DisplayTable && summoners.Any())
+            if (summoners.Any())
             {
                 var output = TableGenerator.GenerateTable(summoners);
                 Console.WriteLine(output);
+            }
+            else
+            {
+                Console.WriteLine("No summoners were retrieved from the Riot Games API");
             }
         }
     }
