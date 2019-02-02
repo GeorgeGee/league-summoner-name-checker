@@ -6,6 +6,7 @@
 - Check the availability of multiple names in bulk on any game server
 - If a name is unavailable, see when the account was last played on and when the name will become available
 - Display the results in a table
+- Export results to CSV
 
 ![screenshot](screenshot.png)
 
@@ -22,6 +23,7 @@ Name|Type|Description
 -|-|-
 `-a` or `--apikey`|String|**Required.** Riot Games API key. Get one for free at https://developer.riotgames.com 
 `-i` or `--input`|String|**Required.** Input `.txt` file path
+`-o` or `--output`|String|*Optional.* Output `.csv` file path
 `-s` or `--server`|String|*Optional.* League of Legends game server code (see below). Default is `euw1` (EU West)
 
 Server|Code

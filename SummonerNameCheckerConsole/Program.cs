@@ -1,12 +1,13 @@
 ﻿using CommandLine;
 using SummonerNameChecker;
+using SummonerNameChecker.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 // TODO:
-// 1. Add CSV file output
+// 1. Add unit tests
 //
 // 2. Handle HttpStatusCode 429 (rate limit exceeded).
 // Could add timers to wait (or retry every ~10s). Could check 429 and see if it tells you how long to wait?
@@ -23,8 +24,8 @@ namespace SummonerNameCheckerConsole
         [Option('i', "input", Required = true, HelpText = "Input .txt file path")]
         public string InputFilePath { get; set; }
 
-        //[Option('o', "output", Required = false, HelpText = "Output .csv file path")]
-        //public string OutputFilePath { get; set; }
+        [Option('o', "output", Required = false, HelpText = "Output .csv file path")]
+        public string OutputFilePath { get; set; }
 
         [Option('s', "server", Required = false, HelpText = "League of Legends game server code. Default is \"euw1\" (EU West)", Default = "euw1")]
         public string Server { get; set; }
@@ -83,12 +84,24 @@ namespace SummonerNameCheckerConsole
 
             if (summoners.Any())
             {
-                var output = TableGenerator.GenerateTable(summoners);
-                Console.WriteLine(output);
-            }
-            else
-            {
-                Console.WriteLine("No summoners were retrieved from the Riot Games API");
+                if (!string.IsNullOrEmpty(options.OutputFilePath))
+                {
+                    try
+                    {
+                        CsvHelper.ExportToCsv(summoners, options.OutputFilePath);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Error while exporting summoners to CSV.\n{e.Message}");
+                    }
+
+                    var output = TableGenerator.GenerateTable(summoners);
+                    Console.WriteLine(output);
+                }
+                else
+                {
+                    Console.WriteLine("No summoners were retrieved from the Riot Games API");
+                }
             }
         }
     }
