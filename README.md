@@ -16,7 +16,8 @@
 3. Open PowerShell or Command Prompt and change directory to the folder which contains the downloaded files
 4. Run the following command:  
 `.\SummonerNameCheckerConsole.exe --apikey "API_KEY" --input "names.txt" --server "euw1"`
-> Replace `API_KEY` with your Riot Games API key. Get one for free at https://developer.riotgames.com
+> Replace `API_KEY` with your Riot Games API key. Get one for free at the [Riot Developer Portal](https://developer.riotgames.com)  
+> [Rate Limits apply](https://developer.riotgames.com/rate-limiting.html). The library will respect these limits by waiting the recommended time period before retrying requests.
 
 ## Arguments
 Name|Type|Description
