@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SummonerNameChecker
@@ -13,19 +14,21 @@ namespace SummonerNameChecker
     {
         private HttpClient _httpClient;
         private string _apiKey;
+        private TimeSpan _timeout;
 
-        public ApiHelper(string apiKey, Server server) :
-            this(apiKey, server.ToServerCode()) { }
+        public ApiHelper(string apiKey, Server server, TimeSpan timeout) :
+            this(apiKey, server.ToServerCode(), timeout) { }
 
-        public ApiHelper(string apiKey, string serverCode)
+        public ApiHelper(string apiKey, string serverCode, TimeSpan timeout)
         {
             if (string.IsNullOrEmpty(apiKey))
                 throw new ArgumentException("Invalid Riot Games API Key", nameof(apiKey));
 
             if (string.IsNullOrEmpty(serverCode))
                 throw new ArgumentException("Invalid server code", nameof(serverCode));
-
+            
             _apiKey = apiKey;
+            _timeout = timeout;
 
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri($"https://{serverCode}.api.riotgames.com/lol/");
@@ -35,61 +38,64 @@ namespace SummonerNameChecker
 
         public async Task<Summoner> GetSummoner(string summonerName)
         {
-            if (summonerName.Length > 16)
-                return new Summoner(summonerName, SummonerNameAvailability.TooLong);
-
-            SummonerDto summonerDto = null;
             try
             {
-                summonerDto = await GetSummonerDTOAsync(summonerName);
-            }
-            catch (RequestException re)
-            {
-                // could not find summoner
-                if (re.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
-                    return new Summoner(summonerName, SummonerNameAvailability.AvailableNotFound);
-                else
-                    return new Summoner(summonerName, SummonerNameAvailability.Unknown); // some other status code
-            }
-            
-            try
-            {
-                var matchListDto = await GetMatchListDTOAsync(summonerDto.AccountId);
+                using (CancellationTokenSource cts = new CancellationTokenSource(_timeout))
+                {
+                    if (summonerName.Length > 16)
+                        return new Summoner(summonerName, SummonerNameAvailability.TooLong);
 
-                return new Summoner(
-                    summonerDto.Name,
-                    summonerDto.SummonerLevel,
-                    summonerDto.Id,
-                    summonerDto.AccountId,
-                    DateTimeOffset.FromUnixTimeMilliseconds(matchListDto.Matches.First().Timestamp).UtcDateTime);
+                    SummonerDto summonerDto = null;
+                    try
+                    {
+                        summonerDto = await ApiRequestAsync<SummonerDto>($"summoner/v4/summoners/by-name/{summonerName}?api_key={_apiKey}", cts.Token);
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        if (e.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            // 404 = summoner does not exist
+                            return new Summoner(summonerName, SummonerNameAvailability.AvailableNotFound);
+                        }
+                        throw;
+                    }
+                    
+                    MatchListDto matchListDto = await ApiRequestAsync<MatchListDto>($"match/v4/matchlists/by-account/{summonerDto.AccountId}?api_key={_apiKey}", cts.Token);
+
+                    return new Summoner(
+                        summonerDto.Name,
+                        summonerDto.SummonerLevel,
+                        summonerDto.Id,
+                        summonerDto.AccountId,
+                        DateTimeOffset.FromUnixTimeMilliseconds(matchListDto.Matches.First().Timestamp).UtcDateTime);
+                }
             }
-            catch (RequestException e)
+            catch (Exception e) when (e is HttpRequestException || e is OperationCanceledException)
             {
-                // could not find match history
                 return new Summoner(summonerName, SummonerNameAvailability.Unknown);
             }
         }
 
-        private async Task<SummonerDto> GetSummonerDTOAsync(string summonerName)
+        private async Task<T> ApiRequestAsync<T>(string uri, CancellationToken cancellationToken)
         {
-            HttpResponseMessage response = await _httpClient.GetAsync($"summoner/v4/summoners/by-name/{summonerName}?api_key={_apiKey}");
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadAsAsync<SummonerDto>();
-            }
-            else
-                throw new RequestException(response);
-        }
+            cancellationToken.ThrowIfCancellationRequested();
 
-        private async Task<MatchListDto> GetMatchListDTOAsync(string accountId)
-        {
-            HttpResponseMessage response = await _httpClient.GetAsync($"match/v4/matchlists/by-account/{accountId}?api_key={_apiKey}");
+            HttpResponseMessage response = await _httpClient.GetAsync(uri, cancellationToken);
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadAsAsync<MatchListDto>();
+                return await response.Content.ReadAsAsync<T>();
             }
-            else
-                throw new RequestException(response);
+            else if (response.StatusCode == (HttpStatusCode)429) // Rate limit exceeded
+            {
+                // default 1 second period if Retry-After header is not included - this is the case when the rate limit is enforced by the underlying service
+                double retryPeriodSeconds = response.Headers?.RetryAfter?.Delta?.TotalSeconds ?? 1;
+
+                // wait the advised time period before retrying
+                await Task.Delay(TimeSpan.FromSeconds(retryPeriodSeconds), cancellationToken);
+                return await ApiRequestAsync<T>(uri, cancellationToken);
+            }
+            // some other status code
+            throw new HttpRequestException(response);
         }
     }
 }

@@ -7,12 +7,10 @@ using System.IO;
 using System.Linq;
 
 // TODO:
-// 1. Add unit tests
-//
-// 2. Handle HttpStatusCode 429 (rate limit exceeded).
-// Could add timers to wait (or retry every ~10s). Could check 429 and see if it tells you how long to wait?
-// if (re.HttpResponseMessage.StatusCode == (HttpStatusCode)429)
-//     Console.WriteLine(Convert.ToInt32(re.HttpResponseMessage.Headers.First().Value.First()));
+// - Add unit tests
+// - Add sorting options (e.g. available date)
+// - Print table incrementally
+// - Handle 404 when getting match list - add new name availability status for possibly available as they've never played
 
 namespace SummonerNameCheckerConsole
 {
@@ -68,12 +66,14 @@ namespace SummonerNameCheckerConsole
             var summoners = new List<Summoner>();
             try
             {
-                apiHelper = new ApiHelper(options.ApiKey, options.Server);
+                apiHelper = new ApiHelper(options.ApiKey, options.Server, TimeSpan.FromMinutes(10)); // 10 min timeout per request - i.e. the maximum rate limit period even for a Production API Key
 
                 foreach (var name in names)
                 {
-                    var summoner = apiHelper.GetSummoner(name)
-                        .GetAwaiter().GetResult();
+                    var summoner = apiHelper
+                        .GetSummoner(name) 
+                        .GetAwaiter()
+                        .GetResult();
                     summoners.Add(summoner);
                 }
             }

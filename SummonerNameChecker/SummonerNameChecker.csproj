@@ -56,7 +56,7 @@
   <ItemGroup>
     <Compile Include="Enums\Server.cs" />
     <Compile Include="Enums\SummonerNameAvailability.cs" />
-    <Compile Include="Exceptions\RequestException.cs" />
+    <Compile Include="Exceptions\HttpRequestException.cs" />
     <Compile Include="Helpers\ApiHelper.cs" />
     <Compile Include="Helpers\CsvHelper.cs" />
     <Compile Include="Models\Data Transfer Objects\MatchListDto.cs" />
