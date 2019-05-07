@@ -1,3 +1,6 @@
+## 1.2.0 (07/05/2019)
+- Fixed an issue where checking the availability of a large quantity of names would fail once a rate limit was hit.
+
 ## 1.1.0 (02/02/2019)
 - Added support for exporting results to CSV file.
 - Added Server/ServerCode conversion extension methods and ApiHelper overload for string serverCode parameter.
