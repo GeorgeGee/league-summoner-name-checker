@@ -59,8 +59,20 @@ namespace SummonerNameChecker
                         }
                         throw;
                     }
-                    
-                    MatchListDto matchListDto = await ApiRequestAsync<MatchListDto>($"match/v4/matchlists/by-account/{summonerDto.AccountId}?api_key={_apiKey}", cts.Token);
+
+                    MatchListDto matchListDto = null;
+                    try
+                    {
+                        matchListDto = await ApiRequestAsync<MatchListDto>($"match/v4/matchlists/by-account/{summonerDto.AccountId}?api_key={_apiKey}", cts.Token);
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        if (e.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            // 404 = no matches played
+                            return new Summoner(summonerName, SummonerNameAvailability.UnknownNeverPlayed);
+                        }
+                    }
 
                     return new Summoner(
                         summonerDto.Name,

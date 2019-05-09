@@ -10,7 +10,7 @@ using System.Linq;
 // - Add unit tests
 // - Add sorting options (e.g. available date)
 // - Print table incrementally
-// - Handle 404 when getting match list - add new name availability status for possibly available as they've never played
+// - Output something when hitting the rate limit, including the retry period
 
 namespace SummonerNameCheckerConsole
 {

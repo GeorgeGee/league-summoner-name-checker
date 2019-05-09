@@ -9,20 +9,20 @@ namespace SummonerNameChecker
         public static string GenerateTable(IEnumerable<Summoner> summoners)
         {
             var sb = new StringBuilder();
-            sb.AppendLine(" __________________________________________________________________________________");
-            sb.AppendLine("|    Summoner Name    |  Last Played (UTC)  | Available From (UTC) |   Available   |");
-            sb.AppendLine("|---------------------|---------------------|----------------------|---------------|");
+            sb.AppendLine(" _________________________________________________________________________________________");
+            sb.AppendLine("|    Summoner Name    |  Last Played (UTC)  | Available From (UTC) |      Available       |");
+            sb.AppendLine("|---------------------|---------------------|----------------------|----------------------|");
 
             foreach (var summoner in summoners)
             {
-                sb.AppendLine(String.Format("| {0,-19} | {1, -19} | {2, -20} | {3, -13} |",
+                sb.AppendLine(String.Format("| {0,-19} | {1, -19} | {2, -20} | {3, -20} |",
                     summoner.NameAvailability == SummonerNameAvailability.TooLong ? $"{summoner.Name.Substring(0, 16)}.." : summoner.Name,
                     summoner.LastPlayedUtc?.ToString() ?? String.Empty,
                     summoner.AvailableOnUtc?.ToString() ?? String.Empty,
                     GetNameAvailabilityText(summoner)));
             }
 
-            sb.Append("|_____________________|_____________________|______________________|_______________|");
+            sb.Append("|_____________________|_____________________|______________________|______________________|");
 
             return sb.ToString();
         }
@@ -62,7 +62,9 @@ namespace SummonerNameChecker
                 case SummonerNameAvailability.AvailableExpired:
                     return "Yes (expired)";
                 case SummonerNameAvailability.TooLong:
-                    return "Too long";
+                    return "Name too long";
+                case SummonerNameAvailability.UnknownNeverPlayed:
+                    return "Maybe (never played)";
                 case SummonerNameAvailability.Unknown:
                 default:
                     return "Unknown";
