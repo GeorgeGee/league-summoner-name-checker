@@ -22,12 +22,12 @@
 ## Arguments
 Name|Type|Description
 -|-|-
-`-a` or `--apikey`|String|**Required.** Riot Games API key. Get one for free at https://developer.riotgames.com 
+`-a` or `--apikey`|String|**Required.** Riot Games API key.<br>Get one for free at https://developer.riotgames.com 
 `-i` or `--input`|String|**Required.** Input `.txt` file path for names to check, line-separated
 `-o` or `--output`|String|*Optional.* Output `.csv` file path for saving results to CSV
-`-s` or `--server`|String|*Optional.* League of Legends game server code (see below). Default is `euw1` (EU West)
-`--sortby`|String|*Optional.* Value to sort the results in the table and/or CSV by. Options are `none` (default), `name`, `lastplayed`, `availablefrom`, and `available`
-`--sortorder`|String|*Optional.* Sorting order, to be used in conjunction with `--sortby`. Options are `asc` for ascending (default) and `desc` for descending
+`-s` or `--server`|String|*Optional.* League of Legends game server code (see table below).<br>Default is `euw1` (EU West)
+`--sortby`|String|*Optional.* Sort the results in the table and/or CSV by a value.<br>Options are `none` (default), `name`, `lastplayed`, `availablefrom`, and `available`
+`--sortorder`|String|*Optional.* Sorting order, to be used in conjunction with `--sortby`.<br>Options are `asc` for ascending (default) and `desc` for descending
 
 Server|Code
 -|-

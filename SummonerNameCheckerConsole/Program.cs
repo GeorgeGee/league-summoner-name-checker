@@ -27,7 +27,7 @@ namespace SummonerNameCheckerConsole
         [Option('s', "server", Required = false, HelpText = "League of Legends game server code. Default is \"euw1\" (EU West)", Default = "euw1")]
         public string Server { get; set; }
 
-        [Option("sortby", Required = false, HelpText = "Value to sort the results in the table and/or CSV by. Options are \"none\" (don't sort), \"name\", \"lastplayed\", \"availablefrom\", and \"available\"", Default = "none")]
+        [Option("sortby", Required = false, HelpText = "Sort the results in the table and/or CSV by a value. Options are \"none\" (don't sort), \"name\", \"lastplayed\", \"availablefrom\", and \"available\"", Default = "none")]
         public string SortBy { get; set; }
 
         [Option("sortorder", Required = false, HelpText = "Sorting order, to be used in conjunction with --sortby. Options are \"asc\" for ascending (default) and \"desc\" for descending", Default = "asc")]
