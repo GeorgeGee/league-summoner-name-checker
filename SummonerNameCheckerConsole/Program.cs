@@ -8,7 +8,6 @@ using System.Linq;
 
 // TODO:
 // - Add unit tests
-// - Add sorting options (e.g. available date)
 // - Print table incrementally
 // - Output something when hitting the rate limit, including the retry period
 
@@ -19,14 +18,20 @@ namespace SummonerNameCheckerConsole
         [Option('a', "apikey", Required = true, HelpText = "Riot Games API key. Get one for free at https://developer.riotgames.com")]
         public string ApiKey { get; set; }
 
-        [Option('i', "input", Required = true, HelpText = "Input .txt file path")]
+        [Option('i', "input", Required = true, HelpText = "Input .txt file path for names to check, line-separated")]
         public string InputFilePath { get; set; }
 
-        [Option('o', "output", Required = false, HelpText = "Output .csv file path")]
+        [Option('o', "output", Required = false, HelpText = "Output .csv file path for saving results to CSV")]
         public string OutputFilePath { get; set; }
 
         [Option('s', "server", Required = false, HelpText = "League of Legends game server code. Default is \"euw1\" (EU West)", Default = "euw1")]
         public string Server { get; set; }
+
+        [Option("sortby", Required = false, HelpText = "Value to sort the results in the table and/or CSV by. Options are \"none\" (don't sort), \"name\", \"lastplayed\", \"availablefrom\", and \"available\"", Default = "none")]
+        public string SortBy { get; set; }
+
+        [Option("sortorder", Required = false, HelpText = "Sorting order, to be used in conjunction with --sortby. Options are \"asc\" for ascending (default) and \"desc\" for descending", Default = "asc")]
+        public string SortOrder { get; set; }
     }
 
     public class Program
@@ -84,6 +89,8 @@ namespace SummonerNameCheckerConsole
 
             if (summoners.Any())
             {
+                summoners = SortSummoners(summoners, options.SortBy, options.SortOrder);
+
                 if (!string.IsNullOrEmpty(options.OutputFilePath))
                 {
                     try
@@ -102,6 +109,35 @@ namespace SummonerNameCheckerConsole
                 {
                     Console.WriteLine("No summoners were retrieved from the Riot Games API");
                 }
+            }
+        }
+
+        private static List<Summoner> SortSummoners(List<Summoner> summoners, string sortBy, string sortOrder)
+        {
+            // default is ascending unless they specified descending
+            bool sortbyDesc = sortOrder != null && sortOrder.Equals("desc", StringComparison.OrdinalIgnoreCase);
+
+            switch (sortBy?.ToLower())
+            {
+                case "name":
+                    return sortbyDesc
+                        ? summoners.OrderByDescending(s => s.Name).ToList()
+                        : summoners.OrderBy(s => s.Name).ToList();
+                case "lastplayed":
+                    return sortbyDesc
+                        ? summoners.OrderByDescending(s => s.LastPlayedUtc).ToList()
+                        : summoners.OrderBy(s => s.LastPlayedUtc).ToList();
+                case "availablefrom":
+                    return sortbyDesc
+                        ? summoners.OrderByDescending(s => s.AvailableOnUtc).ToList()
+                        : summoners.OrderBy(s => s.AvailableOnUtc).ToList();
+                case "available":
+                    return sortbyDesc
+                        ? summoners.OrderByDescending(s => s.NameAvailability).ToList()
+                        : summoners.OrderBy(s => s.NameAvailability).ToList();
+                case "none":
+                default:
+                    return summoners;
             }
         }
     }
