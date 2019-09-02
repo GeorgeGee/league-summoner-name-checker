@@ -91,6 +91,9 @@ namespace SummonerNameCheckerConsole
             {
                 summoners = SortSummoners(summoners, options.SortBy, options.SortOrder);
 
+                var output = TableGenerator.GenerateTable(summoners);
+                Console.WriteLine(output);
+
                 if (!string.IsNullOrEmpty(options.OutputFilePath))
                 {
                     try
@@ -101,14 +104,11 @@ namespace SummonerNameCheckerConsole
                     {
                         Console.WriteLine($"Error while exporting summoners to CSV.\n{e.Message}");
                     }
-
-                    var output = TableGenerator.GenerateTable(summoners);
-                    Console.WriteLine(output);
                 }
-                else
-                {
-                    Console.WriteLine("No summoners were retrieved from the Riot Games API");
-                }
+            }
+            else
+            {
+                Console.WriteLine("No summoners were retrieved from the Riot Games API");
             }
         }
 
