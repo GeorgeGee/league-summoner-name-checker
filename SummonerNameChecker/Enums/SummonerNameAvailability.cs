@@ -1,4 +1,4 @@
-﻿namespace SummonerNameChecker
+﻿namespace SummonerNameChecker.Enums
 {
     public enum SummonerNameAvailability
     {
