@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SummonerNameChecker.Enums;
+using System;
 
 namespace SummonerNameChecker
 {
