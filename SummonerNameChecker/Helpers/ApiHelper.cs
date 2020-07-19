@@ -45,10 +45,12 @@ namespace SummonerNameChecker
                     if (summonerName.Length > 16)
                         return new Summoner(summonerName, SummonerNameAvailability.TooLong);
 
+                    // Fetch Summoner
                     SummonerDto summonerDto = null;
                     try
                     {
                         summonerDto = await ApiRequestAsync<SummonerDto>($"summoner/v4/summoners/by-name/{summonerName}?api_key={_apiKey}", cts.Token);
+
                     }
                     catch (HttpRequestException e)
                     {
@@ -60,6 +62,10 @@ namespace SummonerNameChecker
                         throw;
                     }
 
+                    if (summonerDto == null)
+                        return new Summoner(summonerName, SummonerNameAvailability.Unknown);
+
+                    // Fetch Summoner's match history
                     MatchListDto matchListDto = null;
                     try
                     {
@@ -72,7 +78,11 @@ namespace SummonerNameChecker
                             // 404 = no matches played
                             return new Summoner(summonerName, SummonerNameAvailability.UnknownNeverPlayed);
                         }
+                        throw;
                     }
+
+                    if (matchListDto == null || !matchListDto.Matches.Any())
+                        return new Summoner(summonerName, SummonerNameAvailability.UnknownNeverPlayed);
 
                     return new Summoner(
                         summonerDto.Name,
