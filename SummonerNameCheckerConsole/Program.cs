@@ -6,11 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-// TODO:
-// - Add unit tests
-// - Print table incrementally
-// - Output something when hitting the rate limit, including the retry period
-
 namespace SummonerNameCheckerConsole
 {
     public class Options
