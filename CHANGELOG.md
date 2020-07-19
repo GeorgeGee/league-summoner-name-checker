@@ -1,3 +1,6 @@
+## 1.2.2 (19/07/2020)
+* Fixed null reference exceptions caused by failed API requests for the summoner or their match history where the response code was not 200 OK but an exception was not thrown.
+
 ## 1.2.1 (03/09/2019)
 - Added a new Summoner name availability status for an account that exists but has played no matches, i.e. unknown - the name might be available.
 - Added support for sorting the results in the table and CSV.
