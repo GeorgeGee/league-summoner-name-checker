@@ -1,6 +1,6 @@
 ﻿using CommandLine;
-using SummonerNameChecker;
 using SummonerNameChecker.Helpers;
+using SummonerNameChecker.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;

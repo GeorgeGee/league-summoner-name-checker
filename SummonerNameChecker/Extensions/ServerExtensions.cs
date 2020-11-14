@@ -1,7 +1,7 @@
 ﻿using SummonerNameChecker.Enums;
 using System;
 
-namespace SummonerNameChecker.Models
+namespace SummonerNameChecker.Extensions
 {
     public static class ServerExtensions
     {

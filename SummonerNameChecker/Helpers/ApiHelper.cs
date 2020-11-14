@@ -1,5 +1,8 @@
 ﻿using SummonerNameChecker.Enums;
+using SummonerNameChecker.Exceptions;
+using SummonerNameChecker.Extensions;
 using SummonerNameChecker.Models;
+using SummonerNameChecker.Models.Dto;
 using System;
 using System.Linq;
 using System.Net;
@@ -8,7 +11,7 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SummonerNameChecker
+namespace SummonerNameChecker.Helpers
 {
     public class ApiHelper
     {
@@ -52,9 +55,9 @@ namespace SummonerNameChecker
                         summonerDto = await ApiRequestAsync<SummonerDto>($"summoner/v4/summoners/by-name/{summonerName}?api_key={_apiKey}", cts.Token);
 
                     }
-                    catch (HttpRequestException e)
+                    catch (ApiRequestException e)
                     {
-                        if (e.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                        if (e.StatusCode == HttpStatusCode.NotFound)
                         {
                             // 404 = summoner does not exist
                             return new Summoner(summonerName, SummonerNameAvailability.AvailableNotFound);
@@ -71,9 +74,9 @@ namespace SummonerNameChecker
                     {
                         matchListDto = await ApiRequestAsync<MatchListDto>($"match/v4/matchlists/by-account/{summonerDto.AccountId}?api_key={_apiKey}", cts.Token);
                     }
-                    catch (HttpRequestException e)
+                    catch (ApiRequestException e)
                     {
-                        if (e.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                        if (e.StatusCode == HttpStatusCode.NotFound)
                         {
                             // 404 = no matches played
                             return new Summoner(summonerName, SummonerNameAvailability.UnknownNeverPlayed);
@@ -92,7 +95,7 @@ namespace SummonerNameChecker
                         DateTimeOffset.FromUnixTimeMilliseconds(matchListDto.Matches.First().Timestamp).UtcDateTime);
                 }
             }
-            catch (Exception e) when (e is HttpRequestException || e is OperationCanceledException)
+            catch (Exception e) when (e is ApiRequestException || e is OperationCanceledException)
             {
                 return new Summoner(summonerName, SummonerNameAvailability.Unknown);
             }
@@ -117,7 +120,7 @@ namespace SummonerNameChecker
                 return await ApiRequestAsync<T>(uri, cancellationToken);
             }
             // some other status code
-            throw new HttpRequestException(response);
+            throw new ApiRequestException(response.StatusCode);
         }
     }
 }

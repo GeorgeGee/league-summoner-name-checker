@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using SummonerNameChecker.Models;
 using System.Collections.Generic;
 using System.IO;
 

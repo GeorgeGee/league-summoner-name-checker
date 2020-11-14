@@ -1,9 +1,10 @@
 ﻿using SummonerNameChecker.Enums;
+using SummonerNameChecker.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SummonerNameChecker
+namespace SummonerNameCheckerConsole
 {
     public static class TableGenerator
     {

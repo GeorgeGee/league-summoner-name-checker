@@ -1,7 +1,7 @@
 ﻿using SummonerNameChecker.Enums;
 using System;
 
-namespace SummonerNameChecker
+namespace SummonerNameChecker.Models
 {
     public class Summoner
     {
