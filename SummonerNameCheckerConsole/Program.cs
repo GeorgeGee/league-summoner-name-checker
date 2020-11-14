@@ -93,7 +93,7 @@ namespace SummonerNameCheckerConsole
                 {
                     try
                     {
-                        CsvHelper.ExportToCsv(summoners, options.OutputFilePath);
+                        SummonerNameChecker.Helpers.CsvHelper.ExportToCsv(summoners, options.OutputFilePath);
                     }
                     catch (Exception e)
                     {
