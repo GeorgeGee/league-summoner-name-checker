@@ -53,7 +53,7 @@ Republic of Korea|`kr`
 
 <h2>Notes</h2>
 
-- Both the Library and Console Utility target .NET Framework 4.7.2.
+- Both the Library and Console Utility target .NET 5.0.
 - The Library will respect the [API Rate Limits](https://developer.riotgames.com/rate-limiting.html) by waiting the recommended time period before retrying requests.
 
 <h2>Disclaimer</h2>
