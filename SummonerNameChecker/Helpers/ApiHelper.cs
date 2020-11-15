@@ -53,7 +53,6 @@ namespace SummonerNameChecker.Helpers
                     try
                     {
                         summonerDto = await ApiRequestAsync<SummonerDto>($"summoner/v4/summoners/by-name/{summonerName}?api_key={_apiKey}", cts.Token);
-
                     }
                     catch (ApiRequestException e)
                     {

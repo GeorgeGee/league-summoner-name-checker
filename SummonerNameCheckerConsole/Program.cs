@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SummonerNameCheckerConsole
 {
@@ -31,7 +32,7 @@ namespace SummonerNameCheckerConsole
 
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             ParserResult<Options> result = Parser.Default.ParseArguments<Options>(args);
             if (result.Tag == ParserResultType.NotParsed)
@@ -62,24 +63,21 @@ namespace SummonerNameCheckerConsole
             Console.WriteLine($"Checking availability of {names.Count()} summoner names...\n");
 
             // retrieve summoners
-            ApiHelper apiHelper = null;
             var summoners = new List<Summoner>();
             try
             {
-                apiHelper = new ApiHelper(options.ApiKey, options.Server, TimeSpan.FromMinutes(10)); // 10 min timeout per request - i.e. the maximum rate limit period even for a Production API Key
+                var apiHelper = new ApiHelper(options.ApiKey, options.Server, TimeSpan.FromMinutes(10)); // 10 min timeout per request - i.e. the maximum rate limit period even for a Production API Key
 
                 foreach (var name in names)
                 {
-                    var summoner = apiHelper
-                        .GetSummoner(name) 
-                        .GetAwaiter()
-                        .GetResult();
+                    var summoner = await apiHelper.GetSummoner(name);
                     summoners.Add(summoner);
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Error while communicating with Riot Games API.\n{e.Message}");
+                return;
             }
 
             if (summoners.Any())
