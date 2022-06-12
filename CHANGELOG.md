@@ -1,3 +1,6 @@
+## 2.0.0 (12/06/2022)
+* Updated to use latest Riot Games API endpoints.
+
 ## 1.2.2 (19/07/2020)
 * Fixed null reference exceptions caused by failed API requests for the summoner or their match history where the response code was not 200 OK but an exception was not thrown.
 
