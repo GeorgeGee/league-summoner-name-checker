@@ -35,7 +35,11 @@ namespace SummonerNameCheckerConsole
     {
         public static async Task Main(string[] args)
         {
-            var parser = new Parser(cfg => cfg.CaseInsensitiveEnumValues = true);
+            var parser = new Parser(cfg =>
+            {
+                cfg.CaseInsensitiveEnumValues = true;
+                cfg.HelpWriter = Console.Out;
+            });
             ParserResult<Options> result = parser.ParseArguments<Options>(args);
             if (result.Tag == ParserResultType.NotParsed)
                 return;
