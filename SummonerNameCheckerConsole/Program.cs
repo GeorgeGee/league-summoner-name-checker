@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using SummonerNameChecker.Enums;
 using SummonerNameChecker.Helpers;
 using SummonerNameChecker.Models;
 using System;
@@ -20,8 +21,8 @@ namespace SummonerNameCheckerConsole
         [Option('o', "output", Required = false, HelpText = "Output .csv file path for saving results to CSV")]
         public string OutputFilePath { get; set; }
 
-        [Option('s', "server", Required = false, HelpText = "League of Legends game server code. Default is \"euw1\" (EU West)", Default = "euw1")]
-        public string Server { get; set; }
+        [Option('s', "server", Required = false, HelpText = "League of Legends game server code. Default is \"EUWest\" (EU West)", Default = Server.EUWest)]
+        public Server Server { get; set; }
 
         [Option("sortby", Required = false, HelpText = "Sort the results in the table and/or CSV by a value. Options are \"none\" (don't sort), \"name\", \"lastplayed\", \"availablefrom\", and \"available\"", Default = "none")]
         public string SortBy { get; set; }
@@ -34,7 +35,8 @@ namespace SummonerNameCheckerConsole
     {
         public static async Task Main(string[] args)
         {
-            ParserResult<Options> result = Parser.Default.ParseArguments<Options>(args);
+            var parser = new Parser(cfg => cfg.CaseInsensitiveEnumValues = true);
+            ParserResult<Options> result = parser.ParseArguments<Options>(args);
             if (result.Tag == ParserResultType.NotParsed)
                 return;
             Options options = ((Parsed<Options>)result).Value;

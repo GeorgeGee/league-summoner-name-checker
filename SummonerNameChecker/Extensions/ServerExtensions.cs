@@ -5,7 +5,8 @@ namespace SummonerNameChecker.Extensions
 {
     public static class ServerExtensions
     {
-        public static string ToServerCode(this Server server)
+
+        public static string ToPlatformRoutingValue(this Server server)
         {
             switch (server)
             {
@@ -31,40 +32,31 @@ namespace SummonerNameChecker.Extensions
                     return "jp1";
                 case Server.Turkey:
                     return "tr1";
-                case Server.Unknown:
                 default:
-                    throw new ArgumentException("Unable to find server code for specified server");
+                    throw new ArgumentException("Unknown server");
             }
         }
 
-        public static Server ToServer(this string serverCode)
+        public static string ToRegionalRoutingValue(this Server server)
         {
-            switch (serverCode)
+            switch (server)
             {
-                case "euw1":
-                    return Server.EUWest;
-                case "eun1":
-                    return Server.EUNordicEast;
-                case "na1":
-                    return Server.NorthAmerica;
-                case "br1":
-                    return Server.Brazil;
-                case "la1":
-                    return Server.LatinAmericaNorth;
-                case "la2":
-                    return Server.LatinAmericaSouth;
-                case "oc1":
-                    return Server.Oceania;
-                case "ru":
-                    return Server.Russia;
-                case "kr":
-                    return Server.RepublicOfKorea;
-                case "jp1":
-                    return Server.Japan;
-                case "tr1":
-                    return Server.Turkey;
+                case Server.NorthAmerica:
+                case Server.Brazil:
+                case Server.LatinAmericaNorth:
+                case Server.LatinAmericaSouth:
+                case Server.Oceania:
+                    return "americas";
+                case Server.RepublicOfKorea:
+                case Server.Japan:
+                    return "asia";
+                case Server.EUNordicEast:
+                case Server.EUWest:
+                case Server.Turkey:
+                case Server.Russia:
+                    return "europe";
                 default:
-                    return Server.Unknown;
+                    throw new ArgumentException("Unknown server");
             }
         }
     }

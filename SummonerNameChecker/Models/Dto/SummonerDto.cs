@@ -1,8 +1,5 @@
 ﻿namespace SummonerNameChecker.Models.Dto
 {
-    /// <summary>
-    /// Represents a Summoner returned from Riot Games API
-    /// </summary>
     public class SummonerDto
     {
         public int ProfileIconId { get; set; }

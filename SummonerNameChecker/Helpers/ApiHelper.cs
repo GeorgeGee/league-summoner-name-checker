@@ -4,6 +4,7 @@ using SummonerNameChecker.Extensions;
 using SummonerNameChecker.Models;
 using SummonerNameChecker.Models.Dto;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -17,24 +18,21 @@ namespace SummonerNameChecker.Helpers
     {
         private HttpClient _httpClient;
         private string _apiKey;
+        private string _platformRoutingValue;
+        private string _regionalRoutingValue;
         private TimeSpan _timeout;
 
-        public ApiHelper(string apiKey, Server server, TimeSpan timeout) :
-            this(apiKey, server.ToServerCode(), timeout) { }
-
-        public ApiHelper(string apiKey, string serverCode, TimeSpan timeout)
+        public ApiHelper(string apiKey, Server server, TimeSpan timeout)
         {
             if (string.IsNullOrEmpty(apiKey))
                 throw new ArgumentException("Invalid Riot Games API Key", nameof(apiKey));
-
-            if (string.IsNullOrEmpty(serverCode))
-                throw new ArgumentException("Invalid server code", nameof(serverCode));
             
             _apiKey = apiKey;
+            _platformRoutingValue = server.ToPlatformRoutingValue();
+            _regionalRoutingValue = server.ToRegionalRoutingValue();
             _timeout = timeout;
 
             _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri($"https://{serverCode}.api.riotgames.com/lol/");
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
@@ -52,7 +50,7 @@ namespace SummonerNameChecker.Helpers
                     SummonerDto summonerDto = null;
                     try
                     {
-                        summonerDto = await ApiRequestAsync<SummonerDto>($"summoner/v4/summoners/by-name/{summonerName}?api_key={_apiKey}", cts.Token);
+                        summonerDto = await ApiRequestAsync<SummonerDto>(SummonerDtoRequest(_platformRoutingValue, summonerName, _apiKey), cts.Token);
                     }
                     catch (ApiRequestException e)
                     {
@@ -67,11 +65,11 @@ namespace SummonerNameChecker.Helpers
                     if (summonerDto == null)
                         return new Summoner(summonerName, SummonerNameAvailability.Unknown);
 
-                    // Fetch Summoner's match history
-                    MatchListDto matchListDto = null;
+                    // Fetch IDs of Summoner's recent matches
+                    List<string> matchIds = null;
                     try
                     {
-                        matchListDto = await ApiRequestAsync<MatchListDto>($"match/v4/matchlists/by-account/{summonerDto.AccountId}?api_key={_apiKey}", cts.Token);
+                        matchIds = await ApiRequestAsync<List<string>>(MatchesRequest(_regionalRoutingValue, summonerDto.Puuid, _apiKey), cts.Token);
                     }
                     catch (ApiRequestException e)
                     {
@@ -83,15 +81,31 @@ namespace SummonerNameChecker.Helpers
                         throw;
                     }
 
-                    if (matchListDto == null || !matchListDto.Matches.Any())
+                    if (matchIds == null || !matchIds.Any())
                         return new Summoner(summonerName, SummonerNameAvailability.UnknownNeverPlayed);
+
+                    // Fetch most recent game
+                    MatchDto match = null;
+                    try
+                    {
+                        match = await ApiRequestAsync<MatchDto>(MatchDtoRequest(_regionalRoutingValue, matchIds.First(), _apiKey), cts.Token);
+                    }
+                    catch (ApiRequestException e)
+                    {
+                        if (e.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            // 404 = no matches played
+                            return new Summoner(summonerName, SummonerNameAvailability.UnknownNeverPlayed);
+                        }
+                        throw;
+                    }
 
                     return new Summoner(
                         summonerDto.Name,
                         summonerDto.SummonerLevel,
                         summonerDto.Id,
                         summonerDto.AccountId,
-                        DateTimeOffset.FromUnixTimeMilliseconds(matchListDto.Matches.First().Timestamp).UtcDateTime);
+                        DateTimeOffset.FromUnixTimeMilliseconds(match.Info.GameStartTimestamp).UtcDateTime);
                 }
             }
             catch (Exception e) when (e is ApiRequestException || e is OperationCanceledException)
@@ -121,5 +135,14 @@ namespace SummonerNameChecker.Helpers
             // some other status code
             throw new ApiRequestException(response.StatusCode);
         }
+
+        private static string SummonerDtoRequest(string route, string summonerName, string apiKey)
+            => $"https://{route}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summonerName}?api_key={apiKey}";
+
+        private static string MatchesRequest(string route, string puuid, string apiKey)
+            => $"https://{route}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?api_key={apiKey}";
+
+        private static string MatchDtoRequest(string route, string matchId, string apiKey)
+            => $"https://{route}.api.riotgames.com/lol/match/v5/matches/{matchId}?api_key={apiKey}";
     }
 }

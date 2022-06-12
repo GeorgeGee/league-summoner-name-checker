@@ -19,7 +19,7 @@
 2. Create a text file `names.txt` inside the same folder, containing summoner names to check availability for (line separated)
 3. Open PowerShell or Command Prompt and change directory to the folder which contains the downloaded files
 4. Run the following command:  
-`.\SummonerNameCheckerConsole.exe --apikey "API_KEY" --input "names.txt" --server "euw1"`
+`.\SummonerNameCheckerConsole.exe --apikey "API_KEY" --input "names.txt" --server "EUWest"`
 > Replace `API_KEY` with your Riot Games API key. Get one for free at the [Riot Developer Portal](https://developer.riotgames.com).
 
 <h2>Arguments</h2>
@@ -31,7 +31,7 @@ Name|Type|Description
 `-a` or `--apikey`|String|**Required.** Riot Games API key.<br>Get one for free at https://developer.riotgames.com 
 `-i` or `--input`|String|**Required.** Input `.txt` file path for names to check, line-separated
 `-o` or `--output`|String|*Optional.* Output `.csv` file path for saving results to CSV
-`-s` or `--server`|String|*Optional.* League of Legends game server code (see table below).<br>Default is `euw1` (EU West)
+`-s` or `--server`|String|*Optional.* League of Legends game server code (see table below).<br>Default is `EUWest` (EU West)
 `--sortby`|String|*Optional.* Sort the results in the table and/or CSV by a value.<br>Options are `none` (default), `name`, `lastplayed`, `availablefrom`, and `available`
 `--sortorder`|String|*Optional.* Sorting order, to be used in conjunction with `--sortby`.<br>Options are `asc` for ascending (default) and `desc` for descending
 
@@ -39,17 +39,17 @@ Name|Type|Description
 
 Server|Code
 -|-
-Europe West|`euw1`
-Europe Nordic & East|`eun1`
-North America|`na1`
-Latin America North|`la1`
-Latin America South|`la2`
-Brazil|`br1`
-Japan|`jp1`
-Russia|`ru`
-Turkey|`tr1`
-Oceania|`oc1`
-Republic of Korea|`kr`
+Europe West|`EUWest`
+Europe Nordic & East|`EUNordicEast`
+North America|`NorthAmerica`
+Latin America North|`LatinAmericaNorth`
+Latin America South|`LatinAmericaSouth`
+Brazil|`Brazil`
+Japan|`Japan`
+Russia|`Russia`
+Turkey|`Turkey`
+Oceania|`Oceania`
+Republic of Korea|`RepublicOfKorea`
 
 <h2>Notes</h2>
 
