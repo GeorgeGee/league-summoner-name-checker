@@ -1,3 +1,6 @@
+## 2.0.1 (12/06/2022)
+* Fixed the help screen not displaying when invalid arguments are provided.
+
 ## 2.0.0 (12/06/2022)
 * Updated to use latest Riot Games API endpoints.
 
