@@ -100,12 +100,17 @@ namespace SummonerNameChecker.Helpers
                         throw;
                     }
 
+                    var gameTimestampUnixTimeMs = match.Info.GameStartTimestamp != 0
+                        ? match.Info.GameStartTimestamp
+                        : match.Info.GameEndTimestamp;
+                    var gameTimestamp = DateTimeOffset.FromUnixTimeMilliseconds(gameTimestampUnixTimeMs).UtcDateTime;
+
                     return new Summoner(
                         summonerDto.Name,
                         summonerDto.SummonerLevel,
                         summonerDto.Id,
                         summonerDto.AccountId,
-                        DateTimeOffset.FromUnixTimeMilliseconds(match.Info.GameStartTimestamp).UtcDateTime);
+                        gameTimestamp);
                 }
             }
             catch (Exception e) when (e is ApiRequestException || e is OperationCanceledException)
